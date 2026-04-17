@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "562676073847",
+    "project_id": "rootup-67488",
+    "storage_bucket": "rootup-67488.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:562676073847:android:6d2ca45e11d804b85f0d72",
+        "android_client_info": {
+          "package_name": "com.example.rootup"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "562676073847-c29pfv69p73e1rf6aijvilktgmmibp21.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA5w4i1mf_ZB_n4qi7ZbnEYcAb1PkxJSLA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "562676073847-c29pfv69p73e1rf6aijvilktgmmibp21.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
