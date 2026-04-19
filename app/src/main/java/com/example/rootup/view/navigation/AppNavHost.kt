@@ -1,5 +1,6 @@
 package com.example.rootup.view.navigation
 
+import com.example.rootup.view.OfficeScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -68,6 +69,18 @@ fun AppNavHost(
                 }
             } else {
                 MainWin()
+            }
+        }
+        composable<Office> {
+
+            if (auth.currentUser == null) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Login) {
+                        popUpTo(0)
+                    }
+                }
+            } else {
+                OfficeScreen()
             }
         }
 

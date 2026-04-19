@@ -47,7 +47,6 @@ class MainActivity : ComponentActivity() {
                                     selected = currentDestination.hasRoute<Home>(),
                                     onClick = {
                                         navController.navigate(Home) {
-                                            // Очищаем стек до стартового экрана, чтобы не копить вкладки
                                             popUpTo(navController.graph.startDestinationId) {
                                                 saveState = true
                                             }
@@ -76,6 +75,24 @@ class MainActivity : ComponentActivity() {
                                     },
                                     icon = { Icon(Icons.Default.List, contentDescription = "Дневник") },
                                     label = { Text("Дневник") },
+                                    colors = NavigationBarItemDefaults.colors(
+                                        selectedIconColor = Color.White,
+                                        indicatorColor = Color(0xFF1976D2)
+                                    )
+                                )
+                                NavigationBarItem(
+                                    selected = currentDestination.hasRoute<Office>(),
+                                    onClick = {
+                                        navController.navigate(Office) {
+                                            popUpTo(navController.graph.startDestinationId) {
+                                                saveState = true
+                                            }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
+                                    },
+                                    icon = { Icon(Icons.Default.List, contentDescription = "Кабинет") },
+                                    label = { Text("Кабинет") },
                                     colors = NavigationBarItemDefaults.colors(
                                         selectedIconColor = Color.White,
                                         indicatorColor = Color(0xFF1976D2)
