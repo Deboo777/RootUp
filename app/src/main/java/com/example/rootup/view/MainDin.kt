@@ -102,7 +102,7 @@ fun DayTracker(viewModel: PlantViewModel) {
         ) {
             Text(if (viewModel.completedDays < viewModel.totalDays) "Отметить день" else "Начать новую неделю")
         }
-        Button(onClick = { viewModel.ProgressNull() },
+        Button(onClick = { viewModel.resetProgress() },
             modifier = Modifier.fillMaxWidth(0.8f)
             ){
             Text("Обнуление счетчика")

@@ -6,6 +6,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 data object Home
 
+@Serializable
+data object Login
+
+@Serializable
+data object Registration
+
 //MainDin
 @Serializable
 data object Details
