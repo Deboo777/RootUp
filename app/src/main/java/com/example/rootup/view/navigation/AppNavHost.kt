@@ -1,36 +1,45 @@
 package com.example.rootup.view.navigation
 
-import com.example.rootup.view.OfficeScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import com.example.rootup.model.AppDatabase
+import com.example.rootup.model.PlantRepository
 import com.example.rootup.view.LoginScreen
 import com.example.rootup.view.MainDin
 import com.example.rootup.view.MainWin
+import com.example.rootup.view.OfficeScreen
 import com.example.rootup.view.RegistrationScreen
+import com.example.rootup.viewmodel.PlantViewModel
+import com.example.rootup.viewmodel.PlantViewModelFactory
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun AppNavHost(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     navController: NavHostController
 ) {
-
     val auth = FirebaseAuth.getInstance()
-    val isLoggedIn = auth.currentUser != null
+    val context = LocalContext.current
+
+    val database = AppDatabase.getDatabase(context)
+    val repository = PlantRepository(database.plantDao())
+
+    val plantViewModel: PlantViewModel = viewModel(
+        factory = PlantViewModelFactory(repository)
+    )
 
     NavHost(
         modifier = modifier,
         navController = navController,
         startDestination = Login
     ) {
-
         composable<Login> {
-
             LoginScreen(
                 onLoginSuccess = {
                     navController.navigate(Home) {
@@ -45,7 +54,6 @@ fun AppNavHost(
         }
 
         composable<Registration> {
-
             RegistrationScreen(
                 onSuccess = {
                     navController.navigate(Home) {
@@ -60,24 +68,19 @@ fun AppNavHost(
         }
 
         composable<Home> {
-
             if (auth.currentUser == null) {
                 LaunchedEffect(Unit) {
-                    navController.navigate(Login) {
-                        popUpTo(0)
-                    }
+                    navController.navigate(Login) { popUpTo(0) }
                 }
             } else {
-                MainWin()
+                MainWin(viewModel = plantViewModel)
             }
         }
-        composable<Office> {
 
+        composable<Office> {
             if (auth.currentUser == null) {
                 LaunchedEffect(Unit) {
-                    navController.navigate(Login) {
-                        popUpTo(0)
-                    }
+                    navController.navigate(Login) { popUpTo(0) }
                 }
             } else {
                 OfficeScreen()
@@ -93,7 +96,7 @@ fun AppNavHost(
                     }
                 }
             } else {
-                MainDin()
+                MainDin(viewModel = plantViewModel)
             }
         }
     }

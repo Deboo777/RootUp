@@ -35,7 +35,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rootup.viewmodel.PlantViewModel
 
 @Composable
-fun MainDin ( modifier: Modifier = Modifier,viewModel: PlantViewModel = viewModel()){
+fun MainDin(
+    modifier: Modifier = Modifier,
+    viewModel: PlantViewModel){
     Text("Днивник")
     val bitmap = remember { mutableStateOf<Bitmap?>(null) }
     val launcher = rememberLauncherForActivityResult(
