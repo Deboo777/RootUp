@@ -8,13 +8,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.example.rootup.model.AppDatabase
 import com.example.rootup.model.PlantRepository
-import com.example.rootup.view.LoginScreen
-import com.example.rootup.view.MainDin
-import com.example.rootup.view.MainWin
-import com.example.rootup.view.OfficeScreen
-import com.example.rootup.view.RegistrationScreen
+import com.example.rootup.view.*
+import com.example.rootup.viewmodel.OfficeViewModel
+import com.example.rootup.viewmodel.OfficeViewModelFactory
 import com.example.rootup.viewmodel.PlantViewModel
 import com.example.rootup.viewmodel.PlantViewModelFactory
 import com.google.firebase.auth.FirebaseAuth
@@ -33,6 +32,9 @@ fun AppNavHost(
     val plantViewModel: PlantViewModel = viewModel(
         factory = PlantViewModelFactory(repository)
     )
+    val officeViewModel: OfficeViewModel = viewModel(
+        factory = OfficeViewModelFactory(repository)
+    )
 
     NavHost(
         modifier = modifier,
@@ -44,60 +46,72 @@ fun AppNavHost(
                 onLoginSuccess = {
                     navController.navigate(Home) {
                         popUpTo(Login) { inclusive = true }
-                        launchSingleTop = true
                     }
                 },
-                onRegisterClick = {
-                    navController.navigate(Registration)
-                }
+                onRegisterClick = { navController.navigate(Registration) }
             )
         }
 
         composable<Registration> {
             RegistrationScreen(
-                onSuccess = {
-                    navController.navigate(Home) {
-                        popUpTo(Login) { inclusive = true }
-                        launchSingleTop = true
-                    }
-                },
-                onBack = {
-                    navController.popBackStack()
-                }
+                onSuccess = { navController.navigate(Home) { popUpTo(Login) { inclusive = true } } },
+                onBack = { navController.popBackStack() }
             )
         }
 
         composable<Home> {
             if (auth.currentUser == null) {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Login) { popUpTo(0) }
-                }
+                LaunchedEffect(Unit) { navController.navigate(Login) { popUpTo(0) } }
             } else {
-                MainWin(viewModel = plantViewModel)
+                MainWin(
+                    viewModel = plantViewModel,
+                    onPlantClick = { id -> navController.navigate(Detait(plantId = id)) },
+                    onAddNewTypeClick = { navController.navigate(AddPlantRoute) }
+                )
             }
         }
 
-        composable<Office> {
-            if (auth.currentUser == null) {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Login) { popUpTo(0) }
+        composable<Detait> { backStackEntry ->
+            val args: Detait = backStackEntry.toRoute()
+            Detilit(
+                plantId = args.plantId,
+                viewModel = plantViewModel,
+                onAdded = {
+                    navController.popBackStack()
                 }
-            } else {
-                OfficeScreen()
-            }
+            )
         }
 
         composable<Details> {
-
-            if (auth.currentUser == null) {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Login) {
-                        popUpTo(0)
-                    }
+            MainDin(
+                viewModel = plantViewModel,
+                onPlantClick = { id ->
+                    navController.navigate(PlantStats(plantId = id))
                 }
-            } else {
-                MainDin(viewModel = plantViewModel)
-            }
+            )
+        }
+
+        composable<PlantStats> { backStackEntry ->
+            val args: PlantStats = backStackEntry.toRoute()
+            PlantStatsScreen(
+                plantId = args.plantId,
+                viewModel = plantViewModel,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<Office> {
+            OfficeScreen(viewModel = officeViewModel)
+        }
+
+        composable<AddPlantRoute> {
+            AddPlantScreen(
+                viewModel = plantViewModel,
+                onSave = { navController.popBackStack() }
+            )
         }
     }
 }
+
+
+

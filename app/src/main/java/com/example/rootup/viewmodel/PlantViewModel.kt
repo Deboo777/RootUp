@@ -1,7 +1,5 @@
 package com.example.rootup.viewmodel
 
-
-import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -9,12 +7,11 @@ import com.example.rootup.model.Plant
 import com.example.rootup.model.PlantRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class PlantViewModel(private val repository: PlantRepository) : ViewModel() {
-
-
     val allPlants: StateFlow<List<Plant>> = repository.allPlants
         .stateIn(
             scope = viewModelScope,
@@ -22,21 +19,71 @@ class PlantViewModel(private val repository: PlantRepository) : ViewModel() {
             initialValue = emptyList()
         )
 
-    var completedDays by mutableIntStateOf(3)
-    val totalDays = 7
+    val catalogPlants: StateFlow<List<Plant>> = repository.allPlants
+        .map { list -> list.filter { it.isAddedToDiary == 0 } }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
-    fun addProgress() {
-        if (completedDays < totalDays) completedDays++
-        else completedDays = 0
+    val diaryPlants: StateFlow<List<Plant>> = repository.allPlants
+        .map { list -> list.filter { it.isAddedToDiary == 1 } }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    fun getDaysPassed(timestamp: Long?): Int {
+        if (timestamp == null || timestamp < 1000000000000L) return 0
+        val diff = System.currentTimeMillis() - timestamp
+        val days = (diff / (1000 * 60 * 60 * 24)).toInt()
+        return if (days > 0) days else 0
     }
 
-    fun resetProgress() {
-        completedDays = 0
+    fun insertNewTypeToCatalog(name: String, interval: String, description: String) {
+        val newPlant = Plant(
+            name = name,
+            description = description,
+            photo_path = null,
+            water_interval_days = interval.toIntOrNull() ?: 3,
+            last_watered_timestamp = 0L,
+            isAddedToDiary = 0
+        )
+        viewModelScope.launch {
+            repository.insertPlant(newPlant)
+        }
     }
 
+    fun addCustomPlant(plant: Plant, customName: String) {
+        viewModelScope.launch {
+            val newPlant = plant.copy(
+                id = null,
+                name = customName,
+                isAddedToDiary = 1,
+                last_watered_timestamp = System.currentTimeMillis()
+            )
+            repository.insertPlant(newPlant)
+        }
+    }
+
+
+    fun waterPlant(plant: Plant) {
+        viewModelScope.launch {
+            val updatedPlant = plant.copy(last_watered_timestamp = System.currentTimeMillis())
+            repository.updatePlant(updatedPlant)
+        }
+    }
+
+    fun deletePlant(plantId: Int) {
+        viewModelScope.launch {
+            repository.deleteById(plantId)
+        }
+    }
     fun updatePlant(plant: Plant) {
         viewModelScope.launch {
-            repository.update(plant)
+            repository.updatePlant(plant)
         }
     }
 }

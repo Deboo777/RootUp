@@ -1,113 +1,105 @@
 package com.example.rootup.view
 
-import android.graphics.Bitmap
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rootup.viewmodel.PlantViewModel
 
 @Composable
 fun MainDin(
-    modifier: Modifier = Modifier,
-    viewModel: PlantViewModel){
-    Text("Днивник")
-    val bitmap = remember { mutableStateOf<Bitmap?>(null) }
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicturePreview())
-    { result ->
-        bitmap.value = result
-    }
+    viewModel: PlantViewModel,
+    onPlantClick: (Int) -> Unit
+) {
+    val plants by viewModel.diaryPlants.collectAsState(initial = emptyList())
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
-        bitmap.value?.let {
-            Image(
-                bitmap = it.asImageBitmap(),
-                contentDescription = "Captured Image",
-                modifier = Modifier.size(300.dp)
+    Scaffold { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "Мой Дневник",
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.padding(bottom = 16.dp)
             )
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            if (plants.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = "В дневнике пусто.\nДобавьте растения из каталога.",
+                        color = Color.Gray,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            } else {
+                LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                    items(
+                        items = plants,
+                        key = { it.id ?: 0 }
+                    ) { plant ->
 
-        Button(onClick = { launcher.launch(null) }) {
-            Text(text = "Сделать фото")
-        }
+                        val daysPassed = viewModel.getDaysPassed(plant.last_watered_timestamp)
+                        val interval = plant.water_interval_days ?: 0
+                        val isReady = daysPassed >= interval
 
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Твой прогресс полива:")
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                                .clickable { onPlantClick(plant.id ?: 0) },
+                            elevation = CardDefaults.cardElevation(4.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = plant.name,
+                                        style = MaterialTheme.typography.titleLarge,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = "Прошло дней с полива: $daysPassed",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = Color.Gray
+                                    )
+                                }
 
-            DayTracker(viewModel)
+                                if (isReady) {
+                                    Text(
+                                        text = "ПОРА!",
+                                        color = Color.Red,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        modifier = Modifier.padding(horizontal = 8.dp)
+                                    )
+                                }
 
-        }
-
-    }
-}
-@Composable
-fun DayTracker(viewModel: PlantViewModel) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            repeat(viewModel.totalDays) { index ->
-                val isDone = index < viewModel.completedDays
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .background(if (isDone) Color(0xFF4CAF50) else Color.LightGray),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "${index + 1}", color = if (isDone) Color.White else Color.Black)
+                                IconButton(onClick = { viewModel.deletePlant(plant.id ?: 0) }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = "Удалить",
+                                        tint = Color.Gray
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            onClick = { viewModel.addProgress() },
-            modifier = Modifier.fillMaxWidth(0.8f)
-        ) {
-            Text(if (viewModel.completedDays < viewModel.totalDays) "Отметить день" else "Начать новую неделю")
-        }
-        Button(onClick = { viewModel.resetProgress() },
-            modifier = Modifier.fillMaxWidth(0.8f)
-            ){
-            Text("Обнуление счетчика")
         }
     }
 }

@@ -19,6 +19,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.rootup.ui.theme.RootUpTheme
 import com.example.rootup.view.navigation.*
 
+
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

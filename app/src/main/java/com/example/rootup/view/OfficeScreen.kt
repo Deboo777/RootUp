@@ -18,11 +18,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.rootup.viewmodel.Office
+import com.example.rootup.viewmodel.OfficeViewModel
+
 
 @Composable
-fun OfficeScreen(viewModel: Office = viewModel()) {
+fun OfficeScreen(viewModel: OfficeViewModel) {
 
     val state by viewModel.state.collectAsState()
 
@@ -32,7 +32,6 @@ fun OfficeScreen(viewModel: Office = viewModel()) {
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         Box(
             modifier = Modifier
                 .size(120.dp)
@@ -50,13 +49,11 @@ fun OfficeScreen(viewModel: Office = viewModel()) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-
         Text(
-            text = state.userName.ifEmpty { "Загрузка..." },
+            text = state.userName,
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
         )
-
 
         Text(
             text = "Растений в коллекции: ${state.plantsCount}",
@@ -79,13 +76,23 @@ fun OfficeScreen(viewModel: Office = viewModel()) {
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(state.plants) { plant ->
+            if (state.plants.isEmpty()) {
+                item {
+                    Text(
+                        text = "В вашей оранжерее пока пусто",
+                        modifier = Modifier.padding(16.dp),
+                        color = Color.Gray
+                    )
+                }
+            }
+
+            items(state.plants) { plantName ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
                     ListItem(
-                        headlineContent = { Text(plant) },
+                        headlineContent = { Text(plantName) },
                         leadingContent = {
                             Icon(
                                 imageVector = Icons.Default.Favorite,

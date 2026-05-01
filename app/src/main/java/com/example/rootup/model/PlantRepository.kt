@@ -1,21 +1,20 @@
 package com.example.rootup.model
 
-
 import kotlinx.coroutines.flow.Flow
 
 class PlantRepository(private val plantDao: PlantDao) {
 
     val allPlants: Flow<List<Plant>> = plantDao.getAllPlants()
 
-    suspend fun insert(plant: Plant) {
+    suspend fun insertPlant(plant: Plant) {
         plantDao.insertPlant(plant)
     }
 
-    suspend fun update(plant: Plant) {
+    suspend fun updatePlant(plant: Plant) {
         plantDao.updatePlant(plant)
     }
 
-    suspend fun delete(plantId: Int) {
+    suspend fun deleteById(plantId: Int) {
         plantDao.deleteById(plantId)
     }
 }

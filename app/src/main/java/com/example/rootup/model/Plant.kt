@@ -9,5 +9,6 @@ data class Plant(
     val description: String?,
     val photo_path: String?,
     val water_interval_days: Int?,
-    var days_since_last_water: Int?
+    var last_watered_timestamp: Long? = System.currentTimeMillis(),
+    val isAddedToDiary: Int? = 0
 )
