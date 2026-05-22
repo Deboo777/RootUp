@@ -1,11 +1,11 @@
 package com.example.rootup.model
+
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-
-@Database(entities = [Plant::class], version = 3, exportSchema = false)
+@Database(entities = [Plant::class], version = 4, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun plantDao(): PlantDao
@@ -21,9 +21,9 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "plants_database"
                 )
-                    //.createFromAsset("plants.db")
-                    .fallbackToDestructiveMigration()
+                    .createFromAsset("plants.db")
                     .build()
+
                 INSTANCE = instance
                 instance
             }

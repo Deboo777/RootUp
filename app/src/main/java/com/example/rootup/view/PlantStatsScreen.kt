@@ -1,6 +1,7 @@
 package com.example.rootup.view
 
 import android.graphics.Bitmap
+import coil.compose.AsyncImage
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -23,6 +24,7 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Icon
@@ -42,7 +44,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import com.example.rootup.model.UploadState
 import com.example.rootup.viewmodel.PlantViewModel
 
 @Composable
@@ -51,16 +55,22 @@ fun PlantStatsScreen(
     viewModel: PlantViewModel,
     onBack: () -> Unit
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     val allPlants by viewModel.allPlants.collectAsState(initial = emptyList())
     val plant = allPlants.find { it.id == plantId }
 
     val bitmap = remember { mutableStateOf<Bitmap?>(null) }
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) {
-        bitmap.value = it
+
+    val uploadState by viewModel.uploadState.collectAsState()
+
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { takenBitmap ->
+        if (takenBitmap != null) {
+            bitmap.value = takenBitmap
+            viewModel.uploadPlantPhoto(takenBitmap, plantId)
+        }
     }
 
     val scrollState = rememberScrollState()
-
     val datePickerState = rememberDatePickerState()
     var showDatePicker by remember { mutableStateOf(false) }
 
@@ -70,8 +80,8 @@ fun PlantStatsScreen(
             confirmButton = {
                 TextButton(onClick = {
                     val selectedMillis = datePickerState.selectedDateMillis
-                    if (selectedMillis != null && plant != null) {
-                        viewModel.updatePlant(plant.copy(last_watered_timestamp = selectedMillis))
+                    if (selectedMillis != null) {
+                        viewModel.updatePlantWateringDate(plantId, selectedMillis)
                     }
                     showDatePicker = false
                 }) { Text("ОК") }
@@ -104,19 +114,46 @@ fun PlantStatsScreen(
                 .background(Color.LightGray),
             contentAlignment = Alignment.Center
         ) {
-            bitmap.value?.let {
+            if (!plant?.photo_path.isNullOrEmpty()) {
+                AsyncImage(
+                    model = plant!!.photo_path,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else if (bitmap.value != null) {
                 Image(
-                    bitmap = it.asImageBitmap(),
+                    bitmap = bitmap.value!!.asImageBitmap(),
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize()
                 )
-            } ?: Text("Нет фото", color = Color.DarkGray)
+            } else {
+                Text("Нет фото", color = Color.DarkGray)
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = { launcher.launch(null) }) {
-            Text("Сделать фото")
+        Button(
+            onClick = { launcher.launch(null) },
+            enabled = uploadState !is UploadState.Loading
+        ) {
+            if (uploadState is UploadState.Loading) {
+                CircularProgressIndicator(modifier = Modifier.size(18.dp), color = Color.White, strokeWidth = 2.dp)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Загрузка...")
+            } else {
+                Text("Сделать фото")
+            }
+        }
+
+        if (uploadState is UploadState.Error) {
+            Text(
+                text = "Ошибка загрузки: ${(uploadState as UploadState.Error).message}",
+                color = Color.Red,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(top = 8.dp)
+            )
         }
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -159,6 +196,9 @@ fun PlantStatsScreen(
                     Text(text = "${p.water_interval_days ?: 0} дн.", style = MaterialTheme.typography.bodyLarge)
                 }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             OutlinedButton(
                 onClick = { showDatePicker = true },
                 modifier = Modifier.fillMaxWidth(0.8f)
@@ -172,12 +212,12 @@ fun PlantStatsScreen(
 
             Button(
                 onClick = {
-                    viewModel.waterPlant(p)
+                    plant?.let { p ->
+                        viewModel.waterPlant(p, context)
+                    }
                     onBack()
                 },
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .padding(bottom = 32.dp)
+                modifier = Modifier.fillMaxWidth(0.8f)
             ) {
                 Text("Полил сегодня")
             }
@@ -195,8 +235,67 @@ fun PlantStatsScreen(
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Text(
+                text = "Фотодневник (История роста):",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            val photosList = remember(p.diary_photos_str) {
+                if (!p.diary_photos_str.isNullOrEmpty()) {
+                    p.diary_photos_str.split(",").filter { it.isNotBlank() }
+                } else {
+                    emptyList()
+                }
+            }
+
+            if (photosList.isEmpty()) {
+                Text(
+                    text = "Вы еще не делали снимков для этого растения.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(vertical = 16.dp)
+                )
+            } else {
+                photosList.forEachIndexed { index, url ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Text(
+                                text = "Снимок №${index + 1}",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+
+                            AsyncImage(
+                                model = url,
+                                contentDescription = "Фото из архива дневника",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(220.dp)
+                                    .clip(MaterialTheme.shapes.medium),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
+
+
 
 
