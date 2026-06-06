@@ -1,5 +1,6 @@
-package com.example.rootup.viewmodel
+package com.example.rootup.viewmodel.alarm
 
+import android.R
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
@@ -29,7 +30,7 @@ class WateringAlarmReceiver : BroadcastReceiver() {
 
 
         val builder = NotificationCompat.Builder(context, "watering_reminders")
-            .setSmallIcon(android.R.drawable.stat_notify_chat)
+            .setSmallIcon(R.drawable.stat_notify_chat)
             .setContentTitle("Пора полить!")
             .setContentText("Растение \"$plantName\" хочет пить.")
             .setPriority(NotificationCompat.PRIORITY_HIGH)

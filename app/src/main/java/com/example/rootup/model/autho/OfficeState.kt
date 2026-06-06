@@ -1,4 +1,4 @@
-package com.example.rootup.model
+package com.example.rootup.model.autho
 
 data class OfficeState(
     val userName: String = "Александр",

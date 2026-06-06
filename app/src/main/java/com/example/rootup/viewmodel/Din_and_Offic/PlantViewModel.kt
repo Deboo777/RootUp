@@ -1,4 +1,4 @@
-package com.example.rootup.viewmodel
+package com.example.rootup.viewmodel.Din_and_Offic
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -6,10 +6,11 @@ import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.rootup.model.Plant
-import com.example.rootup.model.PlantRepository
-import com.example.rootup.model.RetrofitClient
-import com.example.rootup.model.UploadState
+import com.example.rootup.model.data_plant.Plant
+import com.example.rootup.model.data_plant.PlantRepository
+import com.example.rootup.model.ImgBB.RetrofitClient
+import com.example.rootup.model.autho.UploadState
+import com.example.rootup.viewmodel.alarm.WateringAlarmManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -62,7 +63,7 @@ class PlantViewModel(private val repository: PlantRepository) : ViewModel() {
                 val requestFile = RequestBody.create("image/jpeg".toMediaTypeOrNull(), byteArray)
                 val imagePart = MultipartBody.Part.createFormData("image", "plant_${plantId}.jpg", requestFile)
 
-                val apiKey = "YOUR_API_KEY"  // Замени на свой ключ
+                val apiKey = "242ac7f8c94b812068314c20aa9463f2"
                 val response = RetrofitClient.api.uploadImage(apiKey, imagePart)
 
                 if (!response.success) {

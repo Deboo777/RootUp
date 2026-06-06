@@ -1,4 +1,4 @@
-package com.example.rootup.model
+package com.example.rootup.model.data_plant
 
 import android.content.Context
 import androidx.room.Database
@@ -30,4 +30,3 @@ abstract class AppDatabase : RoomDatabase() {
         }
     }
 }
-

@@ -1,4 +1,4 @@
-package com.example.rootup.viewmodel
+package com.example.rootup.viewmodel.alarm
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -8,8 +8,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresPermission
-import com.example.rootup.model.Plant
-
+import com.example.rootup.model.data_plant.Plant
+import com.example.rootup.viewmodel.alarm.WateringAlarmReceiver
 
 object WateringAlarmManager {
 

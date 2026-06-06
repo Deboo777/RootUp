@@ -1,9 +1,10 @@
-package com.example.rootup.viewmodel
+package com.example.rootup.viewmodel.Din_and_Offic
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.rootup.model.OfficeState
-import com.example.rootup.model.PlantRepository
+import com.example.rootup.model.autho.OfficeState
+import com.example.rootup.model.data_plant.PlantRepository
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -38,8 +39,8 @@ class OfficeViewModel(private val repository: PlantRepository) : ViewModel() {
             initialValue = OfficeState(isLoading = true)
         )
 }
-class OfficeViewModelFactory(private val repository: PlantRepository) : androidx.lifecycle.ViewModelProvider.Factory {
-    override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+class OfficeViewModelFactory(private val repository: PlantRepository) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return OfficeViewModel(repository) as T
     }
 }

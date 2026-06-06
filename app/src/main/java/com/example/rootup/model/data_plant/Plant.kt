@@ -1,4 +1,4 @@
-package com.example.rootup.model
+package com.example.rootup.model.data_plant
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

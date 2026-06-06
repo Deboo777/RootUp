@@ -1,11 +1,14 @@
-package com.example.rootup.viewmodel
+package com.example.rootup.viewmodel.Regist
 
 import androidx.lifecycle.ViewModel
-import com.example.rootup.model.AppState
+import com.example.rootup.model.autho.AppState
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 class Registration_Login : ViewModel() {
 

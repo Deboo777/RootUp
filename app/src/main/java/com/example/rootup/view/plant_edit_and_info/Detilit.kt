@@ -1,4 +1,4 @@
-package com.example.rootup.view
+package com.example.rootup.view.plant_edit_and_info
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -12,7 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.rootup.viewmodel.PlantViewModel
+import com.example.rootup.viewmodel.Din_and_Offic.PlantViewModel
 
 @Composable
 fun Detilit(

@@ -1,4 +1,4 @@
-package com.example.rootup.model
+package com.example.rootup.model.ImgBB
 
 import com.google.gson.annotations.SerializedName
 

@@ -1,4 +1,4 @@
-package com.example.rootup.view
+package com.example.rootup.view.plant_edit_and_info
 
 import android.graphics.Bitmap
 import coil.compose.AsyncImage
@@ -45,9 +45,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.rootup.model.UploadState
-import com.example.rootup.viewmodel.PlantViewModel
+import com.example.rootup.model.autho.UploadState
+import com.example.rootup.viewmodel.Din_and_Offic.PlantViewModel
 
 @Composable
 fun PlantStatsScreen(
@@ -55,7 +56,7 @@ fun PlantStatsScreen(
     viewModel: PlantViewModel,
     onBack: () -> Unit
 ) {
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
     val allPlants by viewModel.allPlants.collectAsState(initial = emptyList())
     val plant = allPlants.find { it.id == plantId }
 

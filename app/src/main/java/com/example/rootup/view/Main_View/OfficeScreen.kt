@@ -1,4 +1,4 @@
-package com.example.rootup.view
+package com.example.rootup.view.Main_View
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -18,7 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.rootup.viewmodel.OfficeViewModel
+import com.example.rootup.viewmodel.Din_and_Offic.OfficeViewModel
 
 
 @Composable

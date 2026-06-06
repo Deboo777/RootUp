@@ -1,4 +1,4 @@
-package com.example.rootup.view
+package com.example.rootup.view.Main_View
 
 import androidx.compose.runtime.getValue
 import androidx.compose.foundation.clickable
@@ -12,7 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.rootup.viewmodel.PlantViewModel
+import com.example.rootup.viewmodel.Din_and_Offic.PlantViewModel
 
 @Composable
 fun MainWin(

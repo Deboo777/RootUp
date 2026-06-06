@@ -1,7 +1,11 @@
-package com.example.rootup.model
+package com.example.rootup.model.data_plant
 
-
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
+import com.example.rootup.model.data_plant.Plant
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -10,7 +14,7 @@ interface PlantDao {
     @Query("SELECT * FROM plants_table")
     fun getAllPlants(): Flow<List<Plant>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun insertPlant(plant: Plant)
 
     @Update

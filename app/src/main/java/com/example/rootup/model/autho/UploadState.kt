@@ -1,4 +1,4 @@
-package com.example.rootup.model
+package com.example.rootup.model.autho
 
 sealed interface UploadState {
     object Idle : UploadState

@@ -1,5 +1,6 @@
-package com.example.rootup.model
+package com.example.rootup.model.data_plant
 
+import com.example.rootup.model.data_plant.Plant
 import kotlinx.coroutines.flow.Flow
 
 class PlantRepository(private val plantDao: PlantDao) {

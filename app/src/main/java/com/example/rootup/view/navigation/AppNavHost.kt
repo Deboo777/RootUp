@@ -9,13 +9,20 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.example.rootup.model.AppDatabase
-import com.example.rootup.model.PlantRepository
-import com.example.rootup.view.*
-import com.example.rootup.viewmodel.OfficeViewModel
-import com.example.rootup.viewmodel.OfficeViewModelFactory
-import com.example.rootup.viewmodel.PlantViewModel
-import com.example.rootup.viewmodel.PlantViewModelFactory
+import com.example.rootup.model.data_plant.AppDatabase
+import com.example.rootup.model.data_plant.PlantRepository
+import com.example.rootup.view.Main_View.MainDin
+import com.example.rootup.view.Main_View.MainWin
+import com.example.rootup.view.Main_View.OfficeScreen
+import com.example.rootup.view.Regist_Login.LoginScreen
+import com.example.rootup.view.Regist_Login.RegistrationScreen
+import com.example.rootup.view.plant_edit_and_info.AddPlantScreen
+import com.example.rootup.view.plant_edit_and_info.Detilit
+import com.example.rootup.view.plant_edit_and_info.PlantStatsScreen
+import com.example.rootup.viewmodel.Din_and_Offic.OfficeViewModel
+import com.example.rootup.viewmodel.Din_and_Offic.OfficeViewModelFactory
+import com.example.rootup.viewmodel.Din_and_Offic.PlantViewModel
+import com.example.rootup.viewmodel.Din_and_Offic.PlantViewModelFactory
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
@@ -54,7 +61,13 @@ fun AppNavHost(
 
         composable<Registration> {
             RegistrationScreen(
-                onSuccess = { navController.navigate(Home) { popUpTo(Login) { inclusive = true } } },
+                onSuccess = {
+                    navController.navigate(Home) {
+                        popUpTo(Login) {
+                            inclusive = true
+                        }
+                    }
+                },
                 onBack = { navController.popBackStack() }
             )
         }
